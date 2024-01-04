@@ -1,6 +1,7 @@
 package com.example.instagram.controller;
 
-import com.example.instagram.dto.UserDto;
+import com.example.instagram.dto.inputs.UserInput;
+import com.example.instagram.dto.response.UserProfileResponse;
 import com.example.instagram.model.User;
 import com.example.instagram.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,15 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<User> createOrUpdateUser(@RequestBody UserDto userDto,
-                                                   @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
-        return ResponseEntity.ok(userService.saveUser(userDto,authorization));
+    @PostMapping("/signup")
+    public ResponseEntity<User> createOrUpdateUser(@RequestBody UserInput userInput){
+//            ,
+//                                                   @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(userService.saveUser(userInput));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileResponse> getProfile(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(userService.getUserProfile(authorization));
     }
 }

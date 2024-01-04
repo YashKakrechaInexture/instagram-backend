@@ -38,13 +38,13 @@ public class PostController {
         return ResponseEntity.ok(postService.savePost(post,authorization));
     }
 
-    @PostMapping
+    @PostMapping("/like")
     public ResponseEntity<?> likePost(@RequestBody Post post,
                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
         return likeService.likePost(post,authorization);
     }
 
-    @PostMapping
+    @PostMapping("/unlike")
     public ResponseEntity<?> unlikePost(@RequestBody Post post,
                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
         return likeService.unlikePost(post,authorization);

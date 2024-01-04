@@ -1,4 +1,4 @@
-package com.example.instagram;
+package com.example.instagram.security.config;
 
 import com.example.instagram.security.config.JwtAuthenticationEntryPoint;
 import com.example.instagram.security.filter.JwtRequestFilter;
@@ -48,7 +48,8 @@ public class WebSecurityConfig {
         http.cors().and().csrf().disable()
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(new AntPathRequestMatcher("/authenticate"),
-                                new AntPathRequestMatcher("/logout"))
+                                new AntPathRequestMatcher("/logout"),
+                                new AntPathRequestMatcher("/user/signup"))
                         .permitAll()
                         .anyRequest().authenticated()
                 );

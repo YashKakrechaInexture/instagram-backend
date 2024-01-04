@@ -73,4 +73,8 @@ public class JwtTokenUtil implements Serializable {
         }
         return (username.equals(jwtUserDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    public String extractClaimValue(String token, String claim) {
+        return this.getClaimFromToken(token.substring(7), claims -> claims.get(claim)).toString();
+    }
 }

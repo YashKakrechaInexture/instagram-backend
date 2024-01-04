@@ -1,9 +1,9 @@
-package com.example.instagram.dto;
+package com.example.instagram.dto.inputs;
 
 import lombok.Data;
 
 @Data
-public class UserDto {
+public class UserInput {
     private String email;
     private String password;
 }

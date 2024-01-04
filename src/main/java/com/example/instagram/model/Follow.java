@@ -5,15 +5,14 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "user_like")
-public class Like {
+public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private User user;
+    private User followerUser;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Post post;
+    private User followingToUser;
 }
