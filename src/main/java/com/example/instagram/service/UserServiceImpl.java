@@ -1,5 +1,6 @@
 package com.example.instagram.service;
 
+import com.example.instagram.dto.enums.ImageType;
 import com.example.instagram.dto.inputs.UserInput;
 import com.example.instagram.dto.response.UserProfileResponse;
 import com.example.instagram.exception.ResourceNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -32,6 +34,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private ImageService imageService;
 
     @Override
     public List<User> getAll() {
@@ -67,6 +72,14 @@ public class UserServiceImpl implements UserService {
         userProfileResponse.setPostCount(postCount);
         userProfileResponse.setFollowers(followers);
         userProfileResponse.setFollowing(following);
+        try {
+            String base64Image = imageService.getImageByName(user.getProfilePic(), ImageType.PROFILE_PIC);
+            if(base64Image!=null){
+                userProfileResponse.setProfilePic("data:image/jpeg;base64,"+base64Image);
+            }
+        }catch(IOException ioException){
+            System.out.println(ioException);
+        }
         return userProfileResponse;
     }
 }

@@ -8,7 +8,7 @@ public class UserProfileResponse {
     private String username;
     private String fullName;
     private String description;
-//    private String image; //todo
+    private String profilePic;
     private long postCount;
     private long followers;
     private long following;

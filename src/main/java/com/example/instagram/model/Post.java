@@ -12,7 +12,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String picture;
+    private String imageName;
 
     private String caption;
 
