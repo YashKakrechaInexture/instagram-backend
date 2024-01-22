@@ -5,6 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>User Account Registered</title>
     <style>
+        @font-face {
+            font-family: Billabong;
+            font-weight: normal;
+            src: url(../fonts/Billabong.ttf);
+        }
         @media only screen and (max-width: 620px) {
             table[class=body] h1 {
                 font-size: 28px !important;
@@ -99,8 +104,12 @@
                         <td style="border-bottom: solid 3px #3498db; text-align: center; border-radius: 3px;">
                             <br/>
                             <!-- <img src="appURL/assets/jrcc_logo.png" alt="jrcc" style="width:30%"/> -->
-                            <h1 style="padding:0; margin: 0;">Instagram</h1>
-                            <p style="padding:0; margin: 0">Social Media</p>
+
+                            <p style="padding:0; margin: 0; font-family: 'Billabong', cursive; font-size: xxx-large; text-align: center; display: flex; justify-content: center;">
+                                <img src="cid:instagramLogo" alt="new account" style="height: 50px; width: 50px; margin-right: 8px; margin-bottom: 8px" />
+                                Instagram
+                            </p>
+<!--                            <p style="padding:0; margin: 0">Social Media</p>-->
                             <br/>
                         </td>
                     </tr>
@@ -112,8 +121,8 @@
 
                                 <tr>
                                     <td style="text-align: center;">
-                                        <img src="appURL/assets/new_account.png" alt="new account" />
-                                        <h2 style="padding: 0; margin: 0;">User Account Registered</h2>
+<!--                                        <img src="../images/icon.png" alt="new account" style="height: 50px; width: 50px;" />-->
+                                        <h2 style="padding: 0; margin: 0;">User Account Registration</h2>
                                     </td>
                                 </tr>
 
@@ -121,13 +130,12 @@
                                 <tr>
                                     <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Hi {{fullName}},</p>
-                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">A user account has been registed for you on Instagram. Your details are as follows:</p>
+                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">A user account has been registered for you on Instagram. Your details are as follows:</p>
 
                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;"><strong>Username</strong>: {{username}}</p>
                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;"><strong>Email</strong>: {{email}}</p>
 
-                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Please enter the username and password combination to gain access. Once successfully logged in, set your new password to continue. </p>
-                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">If you didn't request this, then you can safely ignore this email. Someone else might have typed your email address by mistake. </p>
+                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Please click on below link to confirm your registration and enter the username/email and password combination to login. </p>
 
                                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">
                                             <tbody>
@@ -137,7 +145,7 @@
                                                         <tbody>
                                                         <tr>
                                                             <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 5px; text-align: center;">
-                                                                <a href="appURL" target="_blank" style="display: inline-block; color: #ffffff; background-color: #65CBE6; border: solid 1px #3498db; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0 auto; padding: 12px 25px; text-transform: uppercase; border-color: #3498db;">Sign-in to Instagram</a>
+                                                                <a href="appURL/enable?email={{email}}&otp={{otp}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #65CBE6; border: solid 1px #3498db; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0 auto; padding: 12px 25px; text-transform: uppercase; border-color: #3498db;">Verify Email</a>
                                                             </td>
                                                         </tr>
                                                         </tbody>
@@ -146,6 +154,7 @@
                                             </tr>
                                             </tbody>
                                         </table>
+                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">If you didn't request this, then you can safely ignore this email. Someone else might have typed your email address by mistake. </p>
                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Regards </p>
                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px; color: #bbb;">
                                             ---- <br/>

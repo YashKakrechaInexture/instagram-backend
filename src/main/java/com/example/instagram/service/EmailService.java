@@ -1,5 +1,7 @@
 package com.example.instagram.service;
 
+import com.example.instagram.dto.internal.EmailDetails;
+
 public interface EmailService {
-    void sendSignupMail(String email);
+    String sendMail(EmailDetails emailDetails);
 }

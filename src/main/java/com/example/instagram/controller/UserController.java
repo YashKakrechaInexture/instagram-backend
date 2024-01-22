@@ -1,7 +1,9 @@
 package com.example.instagram.controller;
 
-import com.example.instagram.dto.inputs.UserInput;
+import com.example.instagram.dto.inputs.EnableUserInput;
+import com.example.instagram.dto.inputs.UserSignupInput;
 import com.example.instagram.dto.response.ResponseMessage;
+import com.example.instagram.dto.response.SearchUserResponse;
 import com.example.instagram.dto.response.UserProfileResponse;
 import com.example.instagram.model.User;
 import com.example.instagram.service.UserService;
@@ -32,8 +34,13 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ResponseMessage> createOrUpdateUser(@RequestBody UserInput userInput){
-        return ResponseEntity.ok(userService.saveUser(userInput));
+    public ResponseEntity<ResponseMessage> createOrUpdateUser(@RequestBody UserSignupInput userSignupInput){
+        return ResponseEntity.ok(userService.saveUser(userSignupInput));
+    }
+
+    @PostMapping("/enable")
+    public ResponseEntity<ResponseMessage> enableUser(@RequestBody EnableUserInput enableUserInput){
+        return ResponseEntity.ok(userService.enableUser(enableUserInput));
     }
 
     @GetMapping("/profile")
@@ -45,5 +52,23 @@ public class UserController {
     public ResponseEntity<ResponseMessage> updateProfilePic(@RequestParam("profile-pic") MultipartFile profilePic,
                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
         return ResponseEntity.ok(userService.updateProfilePic(profilePic, authorization));
+    }
+
+    @GetMapping("/searchUser")
+    public ResponseEntity<List<SearchUserResponse>> searchUserByUsername(@RequestParam("username") String username,
+                                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(userService.searchUserByUsername(username, authorization));
+    }
+
+    @PostMapping("/follow")
+    public ResponseEntity<ResponseMessage> followUser(@RequestParam("followUsername") String followUsername,
+                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(userService.followUser(followUsername, authorization));
+    }
+
+    @PostMapping("/unfollow")
+    public ResponseEntity<ResponseMessage> unfollowUser(@RequestParam("followUsername") String followUsername,
+                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(userService.unfollowUser(followUsername, authorization));
     }
 }

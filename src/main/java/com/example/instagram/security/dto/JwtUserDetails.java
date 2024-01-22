@@ -15,6 +15,7 @@ public class JwtUserDetails implements UserDetails {
     private String email;
     private String password;
     private boolean admin;
+    private boolean enabled;
     private Set<GrantedAuthority> authorities;
 
     @Override

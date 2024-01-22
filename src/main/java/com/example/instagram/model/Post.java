@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @Entity
@@ -16,8 +17,11 @@ public class Post {
 
     private String caption;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne
     private User user;
+
+    @OneToMany
+    private List<Comment> commentList;
 
     @CreationTimestamp
     @Column(updatable = false)

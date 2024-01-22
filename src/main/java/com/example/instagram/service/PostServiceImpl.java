@@ -37,7 +37,7 @@ public class PostServiceImpl implements PostService {
     public Post savePost(Post post, String authorization) {
         if(post.getId()==0) {
             String email = jwtTokenUtil.getUsernameFromToken(authorization.substring(7));
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmailAndEnabled(email,true);
             post.setUser(user);
         }
         return postRepository.save(post);

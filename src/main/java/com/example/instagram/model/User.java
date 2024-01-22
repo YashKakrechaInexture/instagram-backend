@@ -29,5 +29,7 @@ public class User {
 
     private String profilePic;
 
-    private boolean authenticated;
+    private boolean enabled;
+
+    private String otp;
 }

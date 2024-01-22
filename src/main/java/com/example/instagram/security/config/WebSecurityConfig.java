@@ -49,7 +49,9 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(new AntPathRequestMatcher("/authenticate"),
                                 new AntPathRequestMatcher("/logout"),
-                                new AntPathRequestMatcher("/user/signup"))
+                                new AntPathRequestMatcher("/user/signup"),
+                                new AntPathRequestMatcher("/user/enable")
+                        )
                         .permitAll()
                         .anyRequest().authenticated()
                 );

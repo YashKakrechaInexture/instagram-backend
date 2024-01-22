@@ -7,10 +7,7 @@ import com.example.instagram.security.service.JwtUserDetailsService;
 import com.example.instagram.security.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,9 +38,11 @@ public class AuthenticationController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         } catch (DisabledException e) {
-            throw new DisabledException("USER DISABLED", e);
+            throw new DisabledException("User is Disabled", e);
+        }  catch (LockedException e) {
+            throw new DisabledException("User is Locked", e);
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("INVALID CREDENTIALS", e);
+            throw new BadCredentialsException("Invalid Credentials", e);
         }
     }
 }

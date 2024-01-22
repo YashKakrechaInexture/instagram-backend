@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface FollowRepository extends JpaRepository<Follow,Long> {
     long countByFollowerUser_Id(long id);
     long countByFollowingToUser_Id(long id);
+    boolean existsByFollowerUser_IdAndFollowingToUser_Id(long followerUser, long followingToUser);
+    Follow findByFollowerUser_IdAndFollowingToUser_Id(long followerUser, long followingToUser);
 }

@@ -1,26 +1,39 @@
 package com.example.instagram.service;
 
 import com.example.instagram.dto.enums.ImageType;
-import com.example.instagram.dto.inputs.UserInput;
+import com.example.instagram.dto.inputs.EnableUserInput;
+import com.example.instagram.dto.inputs.UserSignupInput;
+import com.example.instagram.dto.internal.EmailDetails;
+import com.example.instagram.dto.projections.SearchUserProjection;
 import com.example.instagram.dto.response.ResponseMessage;
+import com.example.instagram.dto.response.SearchUserResponse;
 import com.example.instagram.dto.response.UserProfileResponse;
 import com.example.instagram.exception.ResourceNotFoundException;
 import com.example.instagram.mappers.ModelMapper;
+import com.example.instagram.model.Follow;
 import com.example.instagram.model.User;
 import com.example.instagram.repository.FollowRepository;
 import com.example.instagram.repository.PostRepository;
 import com.example.instagram.repository.UserRepository;
 import com.example.instagram.security.util.JwtTokenUtil;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -40,6 +53,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${server.url}")
+    private String serverUrl;
+
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
@@ -47,23 +66,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id:"+id));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: "+id));
     }
 
     @Override
-    public ResponseMessage saveUser(UserInput userInput) {
-        if(userRepository.existsByEmail(userInput.getEmail())){
-            throw new ResourceNotFoundException("User already exist with Email : "+userInput.getEmail());
+    @Transactional
+    public ResponseMessage saveUser(UserSignupInput userSignupInput) {
+        if(userRepository.existsByEmail(userSignupInput.getEmail())){
+            throw new ResourceNotFoundException("User already exist with Email: "+ userSignupInput.getEmail());
         }
-        if(userRepository.existsByUsername(userInput.getUsername())){
-            throw new ResourceNotFoundException("User already exist with Username : "+userInput.getUsername());
+        if(userRepository.existsByUsername(userSignupInput.getUsername())){
+            throw new ResourceNotFoundException("User already exist with Username: "+ userSignupInput.getUsername());
         }
         User user = new User();
-        user.setEmail(userInput.getEmail());
+        user.setEmail(userSignupInput.getEmail());
+        user.setUsername(userSignupInput.getUsername());
+        user.setFullName(userSignupInput.getFullName());
         user.setAdmin(false);
-        user.setPassword(passwordEncoder.encode(userInput.getPassword()));
+        user.setPassword(passwordEncoder.encode(userSignupInput.getPassword()));
+        user.setEnabled(false);
+        user.setOtp(UUID.randomUUID().toString());
         userRepository.save(user);
-        return new ResponseMessage("Email Sent in your email address.");
+        return sendSignupMail(user);
+    }
+
+    @Override
+    @Transactional
+    public ResponseMessage enableUser(EnableUserInput enableUserInput) {
+        User user = userRepository.findByEmail(enableUserInput.getEmail());
+        if(user==null){
+            throw new ResourceNotFoundException("User not found with email: "+enableUserInput.getEmail());
+        }
+        if(!user.getOtp().equals(enableUserInput.getOtp())){
+            throw new ResourceNotFoundException("Invalid OTP!");
+        }
+        user.setOtp(null);
+        user.setEnabled(true);
+        userRepository.save(user);
+        return new ResponseMessage("User Enabled!");
     }
 
     @Override
@@ -76,14 +116,7 @@ public class UserServiceImpl implements UserService {
         userProfileResponse.setPostCount(postCount);
         userProfileResponse.setFollowers(followers);
         userProfileResponse.setFollowing(following);
-        try {
-            String base64Image = imageService.getBase64ImageByName(user.getProfilePic(), ImageType.PROFILE_PIC);
-            if(base64Image!=null){
-                userProfileResponse.setProfilePic("data:image/jpeg;base64,"+base64Image);
-            }
-        }catch(IOException ioException){
-            System.out.println(ioException);
-        }
+        userProfileResponse.setProfilePic(getBase64ImageFromImagePath(user.getProfilePic()));
         return userProfileResponse;
     }
 
@@ -106,9 +139,97 @@ public class UserServiceImpl implements UserService {
         return new ResponseMessage("Profile-Pic Updated Successfully.");
     }
 
+    @Override
+    public List<SearchUserResponse> searchUserByUsername(String searchUsername, String authorization) {
+        User user = getUserFromAuthorizationToken(authorization);
+        List<SearchUserProjection> searchUserProjectionList = userRepository.findByUsernameStartsWithAndUsernameNot(searchUsername, user.getUsername());
+        List<SearchUserResponse> searchUserResponseList = new ArrayList<>();
+        for(SearchUserProjection searchUserProjection : searchUserProjectionList){
+            SearchUserResponse searchUserResponse = ModelMapper.searchUserProjectionToSearchUserResponse(searchUserProjection);
+            searchUserResponse.setProfilePic(getBase64ImageFromImagePath(searchUserProjection.getProfilePic()));
+            searchUserResponse.setFollowing(followRepository.existsByFollowerUser_IdAndFollowingToUser_Id(user.getId(), searchUserProjection.getId()));
+            searchUserResponseList.add(searchUserResponse);
+        }
+        return searchUserResponseList;
+    }
+
+    @Override
+    public ResponseMessage followUser(String followUsername, String authorization) {
+        User user = getUserFromAuthorizationToken(authorization);
+        User followingToUser = userRepository.findByUsername(followUsername);
+        if(followingToUser==null){
+            throw new ResourceNotFoundException("User not found with username: "+followUsername);
+        }
+        if(user.getId()==followingToUser.getId()){
+            throw new IllegalArgumentException("You cannot follow yourself.");
+        }
+        if(followRepository.existsByFollowerUser_IdAndFollowingToUser_Id(user.getId(), followingToUser.getId())){
+            throw new IllegalArgumentException("Already following.");
+        }
+        Follow follow = new Follow();
+        follow.setFollowerUser(user);
+        follow.setFollowingToUser(followingToUser);
+        followRepository.save(follow);
+        return new ResponseMessage("Followed: "+followUsername);
+    }
+
+    @Override
+    public ResponseMessage unfollowUser(String followUsername, String authorization) {
+        User user = getUserFromAuthorizationToken(authorization);
+        User followingToUser = userRepository.findByUsername(followUsername);
+        if(followingToUser==null){
+            throw new ResourceNotFoundException("User not found with username: "+followUsername);
+        }
+        if(user.getId()==followingToUser.getId()){
+            throw new IllegalArgumentException("You cannot unfollow yourself.");
+        }
+        Follow follow = followRepository.findByFollowerUser_IdAndFollowingToUser_Id(user.getId(), followingToUser.getId());
+        if(follow==null){
+            throw new IllegalArgumentException("You are not following: "+followUsername);
+        }
+        followRepository.delete(follow);
+        return new ResponseMessage("UnFollowed: "+followUsername);
+    }
+
     private User getUserFromAuthorizationToken(String authorization){
         String strId = jwtTokenUtil.extractClaimValue(authorization, JwtTokenUtil.JWT_ID);
         long id = Long.parseLong(strId);
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: "+id));
+    }
+
+    private String getBase64ImageFromImagePath(String imageName){
+        if(imageName!=null) {
+            try {
+                String base64Image = imageService.getBase64ImageByName(imageName, ImageType.PROFILE_PIC);
+                if (base64Image != null) {
+                    return "data:image/jpeg;base64," + base64Image;
+                }
+            } catch (IOException ioException) {
+                logger.error(ioException.toString());
+            }
+        }
+        return null;
+    }
+
+    private ResponseMessage sendSignupMail(User user){
+        try {
+            Path newAccountTemplateFile = Path.of(UserServiceImpl.class.getResource("/templates/signup-template.html").getPath());
+            String template = Files.readString(newAccountTemplateFile);
+
+            template = template.replace("{{fullName}}", user.getFullName());
+            template = template.replace("{{username}}", user.getUsername());
+            template = template.replace("{{email}}", user.getEmail());
+            template = template.replace("{{otp}}", user.getOtp());
+            template = template.replaceAll("appURL", serverUrl);
+
+            EmailDetails emailDetails = new EmailDetails();
+            emailDetails.setRecipient(user.getEmail());
+            emailDetails.setMsgBody(template);
+            emailDetails.setSubject("Instagram User Registration");
+            return new ResponseMessage(emailService.sendMail(emailDetails));
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            throw new ResourceNotFoundException("Email Template Not Found.");
+        }
     }
 }

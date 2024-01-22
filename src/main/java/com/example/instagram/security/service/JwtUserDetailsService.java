@@ -19,7 +19,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmailAndEnabled(email,true);
         if(user==null){
             throw new UsernameNotFoundException("User not found with username: " + email);
         }
@@ -28,6 +28,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         userDetails.setEmail(user.getEmail());
         userDetails.setPassword(user.getPassword());
         userDetails.setAdmin(user.isAdmin());
+        userDetails.setEnabled(user.isEnabled());
         userDetails.setAuthorities(new HashSet<>());
         return userDetails;
     }
