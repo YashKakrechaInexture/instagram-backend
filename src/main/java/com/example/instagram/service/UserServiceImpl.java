@@ -7,6 +7,7 @@ import com.example.instagram.dto.internal.EmailDetails;
 import com.example.instagram.dto.projections.SearchUserProjection;
 import com.example.instagram.dto.response.ResponseMessage;
 import com.example.instagram.dto.response.SearchUserResponse;
+import com.example.instagram.dto.response.UserFollowDTO;
 import com.example.instagram.dto.response.UserProfileResponse;
 import com.example.instagram.exception.ResourceNotFoundException;
 import com.example.instagram.mappers.ModelMapper;
@@ -72,6 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseMessage saveUser(UserSignupInput userSignupInput) {
+        userSignupInput.setUsername(userSignupInput.getUsername().toLowerCase());
         if(userRepository.existsByEmail(userSignupInput.getEmail())){
             throw new ResourceNotFoundException("User already exist with Email: "+ userSignupInput.getEmail());
         }
@@ -191,9 +193,55 @@ public class UserServiceImpl implements UserService {
         return new ResponseMessage("UnFollowed: "+followUsername);
     }
 
-    private User getUserFromAuthorizationToken(String authorization){
+    @Override
+    public List<UserFollowDTO> followersList(String username, String authorization) {
+        long tokenUserId = getUserIdFromAuthorizationToken(authorization);
+        User searchUser = userRepository.findByUsername(username);
+        List<Follow> followersList = followRepository.findAllByFollowingToUser_Id(searchUser.getId());
+        List<UserFollowDTO> followers = new ArrayList<>();
+        for(Follow follower : followersList){
+            UserFollowDTO userFollowDTO = ModelMapper.userToUserFollowDTO(follower.getFollowerUser());
+            userFollowDTO.setProfilePic(getBase64ImageFromImagePath(userFollowDTO.getProfilePic()));
+            userFollowDTO.setFollowing(followRepository.existsByFollowerUser_IdAndFollowingToUser_Id(tokenUserId,follower.getFollowerUser().getId()));
+            userFollowDTO.setSelfUser(follower.getFollowerUser().getId() == tokenUserId);
+            followers.add(userFollowDTO);
+        }
+        return followers;
+    }
+
+    @Override
+    public List<UserFollowDTO> followingList(String username, String authorization) {
+        long tokenUserId = getUserIdFromAuthorizationToken(authorization);
+        User searchUser = userRepository.findByUsername(username);
+        List<Follow> followingList = followRepository.findAllByFollowerUser_Id(searchUser.getId());
+        List<UserFollowDTO> following = new ArrayList<>();
+        for(Follow follower : followingList){
+            UserFollowDTO userFollowDTO = ModelMapper.userToUserFollowDTO(follower.getFollowingToUser());
+            userFollowDTO.setProfilePic(getBase64ImageFromImagePath(userFollowDTO.getProfilePic()));
+            userFollowDTO.setFollowing(followRepository.existsByFollowerUser_IdAndFollowingToUser_Id(tokenUserId,follower.getFollowingToUser().getId()));
+            userFollowDTO.setSelfUser(follower.getFollowingToUser().getId() == tokenUserId);
+            following.add(userFollowDTO);
+        }
+        return following;
+    }
+
+    private List<Follow> getFollowersList(String authorization){
+        long userId = getUserIdFromAuthorizationToken(authorization);
+        return followRepository.findAllByFollowingToUser_Id(userId);
+    }
+
+    //todo : use this in get post list
+    private List<Follow> getFollowingList(String authorization){
+        long userId = getUserIdFromAuthorizationToken(authorization);
+        return followRepository.findAllByFollowerUser_Id(userId);
+    }
+
+    private long getUserIdFromAuthorizationToken(String authorization){
         String strId = jwtTokenUtil.extractClaimValue(authorization, JwtTokenUtil.JWT_ID);
-        long id = Long.parseLong(strId);
+        return Long.parseLong(strId);
+    }
+    private User getUserFromAuthorizationToken(String authorization){
+        long id = getUserIdFromAuthorizationToken(authorization);
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: "+id));
     }
 

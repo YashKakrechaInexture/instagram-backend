@@ -2,6 +2,7 @@ package com.example.instagram.mappers;
 
 import com.example.instagram.dto.projections.SearchUserProjection;
 import com.example.instagram.dto.response.SearchUserResponse;
+import com.example.instagram.dto.response.UserFollowDTO;
 import com.example.instagram.dto.response.UserProfileResponse;
 import com.example.instagram.model.User;
 
@@ -21,5 +22,13 @@ public class ModelMapper {
         searchUserResponse.setUsername(searchUserProjection.getUsername());
         searchUserResponse.setFullName(searchUserProjection.getFullName());
         return searchUserResponse;
+    }
+
+    public static UserFollowDTO userToUserFollowDTO(User user){
+        UserFollowDTO userFollowDTO = new UserFollowDTO();
+        userFollowDTO.setUsername(user.getUsername());
+        userFollowDTO.setFullName(user.getFullName());
+        userFollowDTO.setProfilePic(user.getProfilePic());
+        return userFollowDTO;
     }
 }

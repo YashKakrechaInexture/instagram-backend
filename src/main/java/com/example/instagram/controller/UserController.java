@@ -4,6 +4,7 @@ import com.example.instagram.dto.inputs.EnableUserInput;
 import com.example.instagram.dto.inputs.UserSignupInput;
 import com.example.instagram.dto.response.ResponseMessage;
 import com.example.instagram.dto.response.SearchUserResponse;
+import com.example.instagram.dto.response.UserFollowDTO;
 import com.example.instagram.dto.response.UserProfileResponse;
 import com.example.instagram.model.User;
 import com.example.instagram.service.UserService;
@@ -70,5 +71,17 @@ public class UserController {
     public ResponseEntity<ResponseMessage> unfollowUser(@RequestParam("followUsername") String followUsername,
                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
         return ResponseEntity.ok(userService.unfollowUser(followUsername, authorization));
+    }
+
+    @GetMapping("/followersList")
+    public ResponseEntity<List<UserFollowDTO>> followersList(@RequestParam("username") String username,
+                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(userService.followersList(username, authorization));
+    }
+
+    @GetMapping("/followingList")
+    public ResponseEntity<List<UserFollowDTO>> followingList(@RequestParam("username") String username,
+                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(userService.followingList(username, authorization));
     }
 }
