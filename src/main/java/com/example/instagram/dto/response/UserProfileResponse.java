@@ -12,4 +12,7 @@ public class UserProfileResponse {
     private long postCount;
     private long followers;
     private long following;
+    private boolean selfUser;
+    private boolean followedThisUser;
+    private boolean verified;
 }

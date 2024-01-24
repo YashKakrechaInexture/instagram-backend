@@ -9,4 +9,5 @@ public class UserFollowDTO {
     private String profilePic;
     private boolean following;
     private boolean selfUser;
+    private boolean verified;
 }

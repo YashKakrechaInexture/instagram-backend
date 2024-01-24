@@ -32,4 +32,6 @@ public class User {
     private boolean enabled;
 
     private String otp;
+
+    private boolean verified;
 }

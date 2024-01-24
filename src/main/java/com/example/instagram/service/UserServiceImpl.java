@@ -109,8 +109,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileResponse getUserProfile(String authorization) {
-        User user = getUserFromAuthorizationToken(authorization);
+    public UserProfileResponse getUserProfile(String username, String authorization) {
+        long tokenId = getUserIdFromAuthorizationToken(authorization);
+        User user = userRepository.findByUsername(username);
         UserProfileResponse userProfileResponse = ModelMapper.userToUserProfileResponse(user);
         long postCount = postRepository.countByUser_Id(user.getId());
         long followers = followRepository.countByFollowingToUser_Id(user.getId());
@@ -119,6 +120,10 @@ public class UserServiceImpl implements UserService {
         userProfileResponse.setFollowers(followers);
         userProfileResponse.setFollowing(following);
         userProfileResponse.setProfilePic(getBase64ImageFromImagePath(user.getProfilePic()));
+        userProfileResponse.setSelfUser(user.getId()==tokenId);
+        if(!userProfileResponse.isSelfUser()){
+            userProfileResponse.setFollowedThisUser(followRepository.existsByFollowerUser_IdAndFollowingToUser_Id(tokenId, user.getId()));
+        }
         return userProfileResponse;
     }
 

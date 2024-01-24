@@ -8,4 +8,5 @@ public class SearchUserResponse {
     private String fullName;
     private String profilePic;
     private boolean following;
+    private boolean verified;
 }

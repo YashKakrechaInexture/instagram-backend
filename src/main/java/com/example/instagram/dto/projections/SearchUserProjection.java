@@ -5,4 +5,5 @@ public interface SearchUserProjection {
     String getUsername();
     String getFullName();
     String getProfilePic();
+    boolean isVerified();
 }

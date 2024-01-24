@@ -14,6 +14,7 @@ public class ModelMapper {
         userProfileResponse.setUsername(user.getUsername());
         userProfileResponse.setFullName(user.getFullName());
         userProfileResponse.setDescription(user.getDescription());
+        userProfileResponse.setVerified(user.isVerified());
         return userProfileResponse;
     }
 
@@ -21,6 +22,7 @@ public class ModelMapper {
         SearchUserResponse searchUserResponse = new SearchUserResponse();
         searchUserResponse.setUsername(searchUserProjection.getUsername());
         searchUserResponse.setFullName(searchUserProjection.getFullName());
+        searchUserResponse.setVerified(searchUserProjection.isVerified());
         return searchUserResponse;
     }
 
@@ -29,6 +31,7 @@ public class ModelMapper {
         userFollowDTO.setUsername(user.getUsername());
         userFollowDTO.setFullName(user.getFullName());
         userFollowDTO.setProfilePic(user.getProfilePic());
+        userFollowDTO.setVerified(user.isVerified());
         return userFollowDTO;
     }
 }

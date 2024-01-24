@@ -45,8 +45,9 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserProfileResponse> getProfile(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
-        return ResponseEntity.ok(userService.getUserProfile(authorization));
+    public ResponseEntity<UserProfileResponse> getProfile(@RequestParam("username") String username,
+                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(userService.getUserProfile(username, authorization));
     }
 
     @PutMapping("/profile-pic")

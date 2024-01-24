@@ -13,6 +13,7 @@ public class JwtUserDetails implements UserDetails {
 
     private long id;
     private String email;
+    private String username;
     private String password;
     private boolean admin;
     private boolean enabled;
@@ -41,5 +42,9 @@ public class JwtUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public String getActualUsername(){
+        return this.username;
     }
 }

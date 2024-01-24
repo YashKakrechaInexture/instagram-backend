@@ -16,7 +16,7 @@ public interface UserService {
     User getUserById(Long id);
     ResponseMessage saveUser(UserSignupInput userSignupInput);
     ResponseMessage enableUser(EnableUserInput enableUserInput);
-    UserProfileResponse getUserProfile(String authorization);
+    UserProfileResponse getUserProfile(String username, String authorization);
     ResponseMessage updateProfilePic(MultipartFile profilePic, String authorization);
     List<SearchUserResponse> searchUserByUsername(String searchUsername, String authorization);
     ResponseMessage followUser(String followUsername, String authorization);

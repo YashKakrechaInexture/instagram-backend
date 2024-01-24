@@ -31,7 +31,7 @@ public class AuthenticationController {
         authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
         final JwtUserDetails userDetails = (JwtUserDetails) userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok(new JwtResponse(token, userDetails.getActualUsername()));
     }
 
     private void authenticate(String email, String password) {

@@ -26,6 +26,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         JwtUserDetails userDetails = new JwtUserDetails();
         userDetails.setId(user.getId());
         userDetails.setEmail(user.getEmail());
+        userDetails.setUsername(user.getUsername());
         userDetails.setPassword(user.getPassword());
         userDetails.setAdmin(user.isAdmin());
         userDetails.setEnabled(user.isEnabled());
