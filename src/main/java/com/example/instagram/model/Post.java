@@ -15,6 +15,7 @@ public class Post {
 
     private String imageName;
 
+    @Column(length = 1000)
     private String caption;
 
     @OneToOne

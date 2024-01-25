@@ -10,4 +10,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post,Long> {
 
     long countByUser_Id(long id);
+
+    List<Post> findAllByUser_IdOrderByCreateDateTimeDesc(long id);
 }

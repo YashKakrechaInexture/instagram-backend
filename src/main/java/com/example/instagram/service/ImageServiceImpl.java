@@ -17,14 +17,14 @@ import java.util.UUID;
 public class ImageServiceImpl implements ImageService {
 
     @Value("${server.storage.path}")
-    private String storgePath;
+    private String storagePath;
 
     private static final String POST_PATH = "/posts";
     private static final String PROFILE_PIC_PATH = "/profile-pic";
 
     @Override
     public String getBase64ImageByName(String imageName, ImageType imageType) throws IOException {
-        String imagePath = storgePath;
+        String imagePath = storagePath;
         switch(imageType){
             case POST -> imagePath += POST_PATH;
             case PROFILE_PIC -> imagePath += PROFILE_PIC_PATH;
@@ -37,7 +37,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String uploadImage(MultipartFile profilePic, ImageType imageType) throws IOException {
-        String imagePath = storgePath;
+        String imagePath = storagePath;
         switch(imageType){
             case POST -> imagePath += POST_PATH;
             case PROFILE_PIC -> imagePath += PROFILE_PIC_PATH;
@@ -53,7 +53,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public boolean deleteImage(String imageName, ImageType imageType) {
-        String imagePath = storgePath;
+        String imagePath = storagePath;
         switch(imageType){
             case POST -> imagePath += POST_PATH;
             case PROFILE_PIC -> imagePath += PROFILE_PIC_PATH;
