@@ -53,7 +53,7 @@ public class PostServiceImpl implements PostService {
         List<PostResponse> postResponseList = new ArrayList<>();
         for(Post post : postList){
             PostResponse postResponse = ModelMapper.postToPostResponse(post);
-            postResponse.setImage(getBase64ImageFromImagePath(post.getImageName()));
+            postResponse.setImage(getBase64ImageFromImagePath(post.getImageName(), ImageType.POST));
             postResponseList.add(postResponse);
         }
         return postResponseList;
@@ -64,9 +64,10 @@ public class PostServiceImpl implements PostService {
         User user = getUserFromAuthorizationToken(authorization);
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found with id:"+id));
         PostResponse postResponse = ModelMapper.postToPostResponse(post);
-        postResponse.setImage(getBase64ImageFromImagePath(post.getImageName()));
+        postResponse.setImage(getBase64ImageFromImagePath(post.getImageName(), ImageType.POST));
         postResponse.setLikes(likeRepository.countAllByPost_Id(post.getId()));
         postResponse.setLikedByCurrentUser(likeRepository.existsByPost_IdAndUser_Id(post.getId(), user.getId()));
+        postResponse.getUser().setProfilePic(getBase64ImageFromImagePath(postResponse.getUser().getProfilePic(), ImageType.PROFILE_PIC));
         return postResponse;
     }
 
@@ -102,10 +103,10 @@ public class PostServiceImpl implements PostService {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: "+id));
     }
 
-    private String getBase64ImageFromImagePath(String imageName){
+    private String getBase64ImageFromImagePath(String imageName, ImageType imageType){
         if(imageName!=null) {
             try {
-                String base64Image = imageService.getBase64ImageByName(imageName, ImageType.POST);
+                String base64Image = imageService.getBase64ImageByName(imageName, imageType);
                 if (base64Image != null) {
                     return "data:image/jpeg;base64," + base64Image;
                 }
