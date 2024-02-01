@@ -2,10 +2,7 @@ package com.example.instagram.controller;
 
 import com.example.instagram.dto.inputs.EnableUserInput;
 import com.example.instagram.dto.inputs.UserSignupInput;
-import com.example.instagram.dto.response.ResponseMessage;
-import com.example.instagram.dto.response.SearchUserResponse;
-import com.example.instagram.dto.response.UserFollowDTO;
-import com.example.instagram.dto.response.UserProfileResponse;
+import com.example.instagram.dto.response.*;
 import com.example.instagram.model.User;
 import com.example.instagram.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +45,11 @@ public class UserController {
     public ResponseEntity<UserProfileResponse> getProfile(@RequestParam("username") String username,
                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
         return ResponseEntity.ok(userService.getUserProfile(username, authorization));
+    }
+
+    @GetMapping("/message-page-profile")
+    public ResponseEntity<MessagePageProfileResponse> getMessagePageProfile(@RequestParam("username") String username){
+        return ResponseEntity.ok(userService.getMessagePageProfile(username));
     }
 
     @PutMapping("/profile-pic")

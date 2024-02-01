@@ -4,11 +4,9 @@ import com.example.instagram.dto.enums.ImageType;
 import com.example.instagram.dto.inputs.EnableUserInput;
 import com.example.instagram.dto.inputs.UserSignupInput;
 import com.example.instagram.dto.internal.EmailDetails;
+import com.example.instagram.dto.projections.MessagePageProfileProjection;
 import com.example.instagram.dto.projections.SearchUserProjection;
-import com.example.instagram.dto.response.ResponseMessage;
-import com.example.instagram.dto.response.SearchUserResponse;
-import com.example.instagram.dto.response.UserFollowDTO;
-import com.example.instagram.dto.response.UserProfileResponse;
+import com.example.instagram.dto.response.*;
 import com.example.instagram.exception.ResourceNotFoundException;
 import com.example.instagram.mappers.ModelMapper;
 import com.example.instagram.model.Follow;
@@ -125,6 +123,15 @@ public class UserServiceImpl implements UserService {
             userProfileResponse.setFollowedThisUser(followRepository.existsByFollowerUser_IdAndFollowingToUser_Id(tokenId, user.getId()));
         }
         return userProfileResponse;
+    }
+
+    @Override
+    public MessagePageProfileResponse getMessagePageProfile(String username) {
+        MessagePageProfileProjection messagePageProfileProjection = userRepository.findByUsernameIs(username);
+        MessagePageProfileResponse messagePageProfileResponse =
+                ModelMapper.messagePageProfileProjectionToMessagePageProfileResponse(messagePageProfileProjection);
+        messagePageProfileResponse.setProfilePic(getBase64ImageFromImagePath(messagePageProfileResponse.getProfilePic()));
+        return messagePageProfileResponse;
     }
 
     @Override

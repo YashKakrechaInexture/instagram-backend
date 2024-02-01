@@ -1,5 +1,6 @@
 package com.example.instagram.repository;
 
+import com.example.instagram.dto.projections.MessagePageProfileProjection;
 import com.example.instagram.dto.projections.SearchUserProjection;
 import com.example.instagram.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,5 @@ public interface UserRepository extends JpaRepository<User,Long> {
     List<SearchUserProjection> findByUsernameStartingWith(String username);
     List<SearchUserProjection> findByUsernameStartsWithAndUsernameNot(String username, String selfUsername);
     List<SearchUserProjection> findByUsernameIsStartingWith(String username);
+    MessagePageProfileProjection findByUsernameIs(String username);
 }

@@ -1,11 +1,9 @@
 package com.example.instagram.mappers;
 
 import com.example.instagram.dto.inputs.PostInput;
+import com.example.instagram.dto.projections.MessagePageProfileProjection;
 import com.example.instagram.dto.projections.SearchUserProjection;
-import com.example.instagram.dto.response.PostResponse;
-import com.example.instagram.dto.response.SearchUserResponse;
-import com.example.instagram.dto.response.UserFollowDTO;
-import com.example.instagram.dto.response.UserProfileResponse;
+import com.example.instagram.dto.response.*;
 import com.example.instagram.model.Post;
 import com.example.instagram.model.User;
 
@@ -50,5 +48,15 @@ public class ModelMapper {
         postResponse.setCaption(post.getCaption());
         postResponse.setUser(userToUserFollowDTO(post.getUser()));
         return postResponse;
+    }
+
+    public static MessagePageProfileResponse messagePageProfileProjectionToMessagePageProfileResponse(
+            MessagePageProfileProjection messagePageProfileProjection
+    ){
+        MessagePageProfileResponse messagePageProfileResponse = new MessagePageProfileResponse();
+        messagePageProfileResponse.setUsername(messagePageProfileProjection.getUsername());
+        messagePageProfileResponse.setVerified(messagePageProfileProjection.isVerified());
+        messagePageProfileResponse.setProfilePic(messagePageProfileProjection.getProfilePic());
+        return messagePageProfileResponse;
     }
 }

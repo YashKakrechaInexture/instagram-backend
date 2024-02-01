@@ -1,6 +1,7 @@
 package com.example.instagram.service;
 
 import com.example.instagram.dto.inputs.MessageInput;
+import com.example.instagram.dto.response.ChatNotification;
 import com.example.instagram.model.ChatRoom;
 import com.example.instagram.model.Message;
 import com.example.instagram.model.User;
@@ -35,7 +36,12 @@ public class ChatServiceImpl implements ChatService {
         messagingTemplate.convertAndSendToUser(
                 messageInput.getRecipient(),
                 "/queue/message",
-                message
+                ChatNotification.builder()
+                        .id(message.getId())
+                        .chatID(message.getChatId())
+                        .sender(message.getSender().getUsername())
+                        .recipient(message.getRecipient().getUsername())
+                        .build()
         );
     }
 
@@ -50,12 +56,13 @@ public class ChatServiceImpl implements ChatService {
 //                .orElseThrow(() -> new RuntimeException("ChatRoom not found!"));
         ChatRoom chatRoom = null;
 
-        Message message = new Message();
-        message.setChatId(chatRoom.getChatId());
-        message.setSender(sender);
-        message.setRecipient(recipient);
-        message.setMessage(messageInput.getMessage());
-        message.setTimestamp(new Date());
-        return message;
+//        Message message = new Message();
+//        message.setChatId(chatRoom.getChatId());
+//        message.setSender(sender);
+//        message.setRecipient(recipient);
+//        message.setMessage(messageInput.getMessage());
+//        message.setTimestamp(new Date());
+//        return message;
+        return new Message();
     }
 }
