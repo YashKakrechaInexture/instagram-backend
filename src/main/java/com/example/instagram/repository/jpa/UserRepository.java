@@ -1,4 +1,4 @@
-package com.example.instagram.repository;
+package com.example.instagram.repository.jpa;
 
 import com.example.instagram.dto.projections.MessagePageProfileProjection;
 import com.example.instagram.dto.projections.SearchUserProjection;

@@ -1,27 +1,29 @@
 package com.example.instagram.model;
 
+import com.example.instagram.model.enums.MessageStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
 @Data
 @Entity
+@Document
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
     private String chatId;
 
-    @OneToOne
-    private User sender;
+    private String sender;
 
-    @OneToOne
-    private User recipient;
+    private String recipient;
 
     @Column(length = 10000)
     private String message;
 
     private Date timestamp;
+
+    private MessageStatus status;
 }

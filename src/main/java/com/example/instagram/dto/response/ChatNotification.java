@@ -6,8 +6,9 @@ import lombok.Data;
 @Data
 @Builder
 public class ChatNotification {
-    private long id;
+    private String id;
     private String chatID;
     private String sender;
     private String recipient;
+    private String message;
 }

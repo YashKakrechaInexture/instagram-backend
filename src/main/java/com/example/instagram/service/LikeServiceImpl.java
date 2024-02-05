@@ -4,7 +4,7 @@ import com.example.instagram.dto.response.ResponseMessage;
 import com.example.instagram.model.Like;
 import com.example.instagram.model.Post;
 import com.example.instagram.model.User;
-import com.example.instagram.repository.LikeRepository;
+import com.example.instagram.repository.jpa.LikeRepository;
 import com.example.instagram.security.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

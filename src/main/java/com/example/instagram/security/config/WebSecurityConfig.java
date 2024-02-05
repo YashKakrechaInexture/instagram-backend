@@ -50,7 +50,10 @@ public class WebSecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/authenticate"),
                                 new AntPathRequestMatcher("/logout"),
                                 new AntPathRequestMatcher("/user/signup"),
-                                new AntPathRequestMatcher("/user/enable")
+                                new AntPathRequestMatcher("/user/enable"),
+                                new AntPathRequestMatcher("/**/ws/**"),
+                                new AntPathRequestMatcher("/**/chat/**"),
+                                new AntPathRequestMatcher("/**/messages/**")
                         )
                         .permitAll()
                         .anyRequest().authenticated()

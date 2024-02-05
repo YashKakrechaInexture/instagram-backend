@@ -1,4 +1,4 @@
-package com.example.instagram.repository;
+package com.example.instagram.repository.jpa;
 
 import com.example.instagram.model.ChatRoom;
 import com.example.instagram.model.User;
@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom,String> {
 
-    ChatRoom findBySenderAndAndRecipient(User sender, User recipient);
+    ChatRoom findBySenderAndRecipient(User sender, User recipient);
 }

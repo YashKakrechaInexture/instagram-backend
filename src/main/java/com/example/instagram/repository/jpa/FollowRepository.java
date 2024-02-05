@@ -1,4 +1,4 @@
-package com.example.instagram.repository;
+package com.example.instagram.repository.jpa;
 
 import com.example.instagram.model.Follow;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package com.example.instagram.security.service;
 
 import com.example.instagram.model.User;
-import com.example.instagram.repository.UserRepository;
+import com.example.instagram.repository.jpa.UserRepository;
 import com.example.instagram.security.dto.JwtUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

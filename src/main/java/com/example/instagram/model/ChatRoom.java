@@ -7,7 +7,8 @@ import lombok.Data;
 @Entity
 public class ChatRoom {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     private String chatId;
 
