@@ -30,4 +30,9 @@ public class ChatController {
                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
         return ResponseEntity.ok(chatService.getMessages(recipient, authorization));
     }
+
+    @GetMapping("/chat/room-list")
+    public ResponseEntity<?> getChatRoomList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(chatService.getChatRoomList(authorization));
+    }
 }

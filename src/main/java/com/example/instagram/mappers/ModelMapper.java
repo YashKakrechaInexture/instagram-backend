@@ -4,6 +4,8 @@ import com.example.instagram.dto.inputs.PostInput;
 import com.example.instagram.dto.projections.MessagePageProfileProjection;
 import com.example.instagram.dto.projections.SearchUserProjection;
 import com.example.instagram.dto.response.*;
+import com.example.instagram.model.ChatRoom;
+import com.example.instagram.model.Message;
 import com.example.instagram.model.Post;
 import com.example.instagram.model.User;
 
@@ -58,5 +60,31 @@ public class ModelMapper {
         messagePageProfileResponse.setVerified(messagePageProfileProjection.isVerified());
         messagePageProfileResponse.setProfilePic(messagePageProfileProjection.getProfilePic());
         return messagePageProfileResponse;
+    }
+
+    public static ChatRoomDto chatRoomToChatRoomDto(ChatRoom chatRoom){
+        ChatRoomDto chatRoomDto = new ChatRoomDto();
+        chatRoomDto.setChatId(chatRoom.getChatId());
+        chatRoomDto.setSender(userToChatUserResponse(chatRoom.getSender()));
+        return chatRoomDto;
+    }
+
+    public static ChatUserResponse userToChatUserResponse(User user){
+        ChatUserResponse chatUserResponse = new ChatUserResponse();
+        chatUserResponse.setUsername(user.getUsername());
+        chatUserResponse.setFullName(user.getFullName());
+        chatUserResponse.setProfilePic(user.getProfilePic());
+        chatUserResponse.setVerified(user.isVerified());
+        return chatUserResponse;
+    }
+
+    public static LastMessageDto messageToLastMessageDto(Message message){
+        LastMessageDto lastMessageDto = new LastMessageDto();
+        if(message != null) {
+            lastMessageDto.setSender(message.getSender());
+            lastMessageDto.setMessage(message.getMessage());
+            lastMessageDto.setTimestamp(message.getTimestamp());
+        }
+        return lastMessageDto;
     }
 }

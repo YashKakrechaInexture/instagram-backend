@@ -1,8 +1,11 @@
 package com.example.instagram.service;
 
+import com.example.instagram.dto.enums.ImageType;
 import com.example.instagram.dto.inputs.MessageInput;
 import com.example.instagram.dto.response.ChatNotification;
+import com.example.instagram.dto.response.ChatRoomDto;
 import com.example.instagram.exception.ResourceNotFoundException;
+import com.example.instagram.mappers.ModelMapper;
 import com.example.instagram.model.ChatRoom;
 import com.example.instagram.model.Message;
 import com.example.instagram.model.User;
@@ -10,16 +13,18 @@ import com.example.instagram.repository.jpa.ChatRoomRepository;
 import com.example.instagram.repository.mongo.MessageRepository;
 import com.example.instagram.repository.jpa.UserRepository;
 import com.example.instagram.security.util.JwtTokenUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class ChatServiceImpl implements ChatService {
+    private static final Logger logger = LoggerFactory.getLogger(ChatServiceImpl.class);
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -36,6 +41,9 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    private ImageService imageService;
+
     @Override
     public void processMessage(MessageInput messageInput) {
         Message message = fetchMessageFromMessageInput(messageInput);
@@ -49,6 +57,7 @@ public class ChatServiceImpl implements ChatService {
                         .sender(message.getSender())
                         .recipient(message.getRecipient())
                         .message(message.getMessage())
+                        .timestamp(message.getTimestamp())
                         .build()
         );
     }
@@ -59,6 +68,25 @@ public class ChatServiceImpl implements ChatService {
         User recipientUser = userRepository.findByUsername(recipient);
         ChatRoom chatRoom = findChatRoomFromSenderAndRecipient(senderUser, recipientUser, true);
         return messageRepository.findAllByChatId(chatRoom.getChatId());
+    }
+
+    @Override
+    public List<ChatRoomDto> getChatRoomList(String authorization) {
+        User recipientUser = getUserFromAuthorizationToken(authorization);
+        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByRecipient(recipientUser);
+        List<ChatRoomDto> chatRoomDtoList = new ArrayList<>();
+        for(ChatRoom chatRoom : chatRoomList){
+            ChatRoomDto chatRoomDto = ModelMapper.chatRoomToChatRoomDto(chatRoom);
+            chatRoomDto.getSender().setProfilePic(getBase64ImageFromImagePath(chatRoomDto.getSender().getProfilePic()));
+            chatRoomDto.setLastMessage(
+                    ModelMapper.messageToLastMessageDto(
+                            messageRepository.findFirstByChatIdOrderByTimestampDesc(chatRoomDto.getChatId())
+                    )
+            );
+            chatRoomDtoList.add(chatRoomDto);
+        }
+        Collections.sort(chatRoomDtoList, (o1, o2) -> o2.getLastMessage().getTimestamp().compareTo(o1.getLastMessage().getTimestamp()));
+        return chatRoomDtoList;
     }
 
     private Message fetchMessageFromMessageInput(MessageInput messageInput){
@@ -103,5 +131,19 @@ public class ChatServiceImpl implements ChatService {
     private User getUserFromAuthorizationToken(String authorization){
         long id = getUserIdFromAuthorizationToken(authorization);
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: "+id));
+    }
+
+    private String getBase64ImageFromImagePath(String imageName){
+        if(imageName!=null) {
+            try {
+                String base64Image = imageService.getBase64ImageByName(imageName, ImageType.PROFILE_PIC);
+                if (base64Image != null) {
+                    return "data:image/jpeg;base64," + base64Image;
+                }
+            } catch (IOException ioException) {
+                logger.error(ioException.toString());
+            }
+        }
+        return null;
     }
 }

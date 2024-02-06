@@ -10,4 +10,6 @@ import java.util.List;
 public interface MessageRepository extends MongoRepository<Message,Long> {
 
     List<Message> findAllByChatId(String chatId);
+
+    Message findFirstByChatIdOrderByTimestampDesc(String chatId);
 }
