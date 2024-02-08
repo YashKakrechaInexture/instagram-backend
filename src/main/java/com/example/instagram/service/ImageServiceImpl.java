@@ -24,24 +24,14 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String getBase64ImageByName(String imageName, ImageType imageType) throws IOException {
-        String imagePath = storagePath;
-        switch(imageType){
-            case POST -> imagePath += POST_PATH;
-            case PROFILE_PIC -> imagePath += PROFILE_PIC_PATH;
-        }
-        File file = new File(imagePath);
+        String imagePath = getImagePathFromImageType(imageType);
         byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath, imageName));
-        String base64Image = new String(Base64.encodeBase64(imageBytes,false), "UTF-8");
-        return base64Image;
+        return new String(Base64.encodeBase64(imageBytes,false), "UTF-8");
     }
 
     @Override
     public String uploadImage(MultipartFile profilePic, ImageType imageType) throws IOException {
-        String imagePath = storagePath;
-        switch(imageType){
-            case POST -> imagePath += POST_PATH;
-            case PROFILE_PIC -> imagePath += PROFILE_PIC_PATH;
-        }
+        String imagePath = getImagePathFromImageType(imageType);
         String imageName = UUID.randomUUID().toString();
         String[] imageNameParts = profilePic.getOriginalFilename().split("\\.");
         String extension = imageNameParts[imageNameParts.length-1];
@@ -53,12 +43,17 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public boolean deleteImage(String imageName, ImageType imageType) {
+        String imagePath = getImagePathFromImageType(imageType);
+        File file = new File(imagePath,imageName);
+        return file.delete();
+    }
+
+    private String getImagePathFromImageType(ImageType imageType){
         String imagePath = storagePath;
         switch(imageType){
             case POST -> imagePath += POST_PATH;
             case PROFILE_PIC -> imagePath += PROFILE_PIC_PATH;
         }
-        File file = new File(imagePath,imageName);
-        return file.delete();
+        return imagePath;
     }
 }
