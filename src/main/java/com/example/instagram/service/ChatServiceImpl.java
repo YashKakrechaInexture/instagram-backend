@@ -2,17 +2,22 @@ package com.example.instagram.service;
 
 import com.example.instagram.dto.enums.ImageType;
 import com.example.instagram.dto.inputs.MessageInput;
+import com.example.instagram.dto.inputs.ReadMessageInput;
 import com.example.instagram.dto.response.ChatNotification;
 import com.example.instagram.dto.response.ChatRoomDto;
+import com.example.instagram.dto.response.ChatUnreadMessageCountResponse;
+import com.example.instagram.dto.response.MessageDto;
 import com.example.instagram.exception.ResourceNotFoundException;
 import com.example.instagram.mappers.ModelMapper;
 import com.example.instagram.model.ChatRoom;
 import com.example.instagram.model.Message;
 import com.example.instagram.model.User;
+import com.example.instagram.model.enums.MessageStatus;
 import com.example.instagram.repository.jpa.ChatRoomRepository;
 import com.example.instagram.repository.mongo.MessageRepository;
 import com.example.instagram.repository.jpa.UserRepository;
 import com.example.instagram.security.util.JwtTokenUtil;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,11 +68,29 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<Message> getMessages(String recipient, String authorization) {
+    public void readMessage(ReadMessageInput readMessageInput) {
+        Message message = new Message();
+        message.setId(readMessageInput.getId());
+        message = messageRepository.findById(message.getId()).orElseThrow(() -> new ResourceNotFoundException("Message not found with id: "+readMessageInput.getId()));
+        message.setStatus(MessageStatus.READ);
+        messageRepository.save(message);
+    }
+
+    @Override
+    @Transactional
+    public List<MessageDto> getMessages(String recipient, String authorization) {
         User senderUser = getUserFromAuthorizationToken(authorization);
         User recipientUser = userRepository.findByUsername(recipient);
         ChatRoom chatRoom = findChatRoomFromSenderAndRecipient(senderUser, recipientUser, true);
-        return messageRepository.findAllByChatId(chatRoom.getChatId());
+        List<Message> messageList = messageRepository.findAllByChatId(chatRoom.getChatId());
+        List<MessageDto> messageDtoList = new ArrayList<>();
+        for(Message message : messageList){
+            MessageDto messageDto = ModelMapper.messageToMessageDto(message);
+            messageDtoList.add(messageDto);
+            message.setStatus(MessageStatus.READ);
+            messageRepository.save(message);
+        }
+        return messageDtoList;
     }
 
     @Override
@@ -83,10 +106,22 @@ public class ChatServiceImpl implements ChatService {
                             messageRepository.findFirstByChatIdOrderByTimestampDesc(chatRoomDto.getChatId())
                     )
             );
+            int unreadMessages = messageRepository.countBySenderAndRecipientAndStatus(chatRoomDto.getSender().getUsername(),
+                    recipientUser.getUsername(), MessageStatus.DELIVERED);
+            chatRoomDto.setUnreadMessages(unreadMessages);
             chatRoomDtoList.add(chatRoomDto);
         }
         Collections.sort(chatRoomDtoList, (o1, o2) -> o2.getLastMessage().getTimestamp().compareTo(o1.getLastMessage().getTimestamp()));
         return chatRoomDtoList;
+    }
+
+    @Override
+    public ChatUnreadMessageCountResponse getChatUnreadMessageCount(String authorization) {
+        User user = getUserFromAuthorizationToken(authorization);
+        int unreadMessages = messageRepository.countByRecipientAndStatus(user.getUsername(), MessageStatus.DELIVERED);
+        ChatUnreadMessageCountResponse chatUnreadMessageCountResponse = new ChatUnreadMessageCountResponse();
+        chatUnreadMessageCountResponse.setUnreadMessages(unreadMessages);
+        return chatUnreadMessageCountResponse;
     }
 
     private Message fetchMessageFromMessageInput(MessageInput messageInput){
@@ -101,6 +136,7 @@ public class ChatServiceImpl implements ChatService {
         message.setRecipient(recipient.getUsername());
         message.setMessage(messageInput.getMessage());
         message.setTimestamp(new Date());
+        message.setStatus(MessageStatus.DELIVERED);
         return message;
     }
 

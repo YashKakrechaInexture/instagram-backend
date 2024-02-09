@@ -1,6 +1,7 @@
 package com.example.instagram.controller;
 
 import com.example.instagram.dto.inputs.MessageInput;
+import com.example.instagram.dto.inputs.ReadMessageInput;
 import com.example.instagram.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +26,11 @@ public class ChatController {
         chatService.processMessage(messageInput);
     }
 
+    @MessageMapping("/chat/read")
+    public void readMessage(@Payload ReadMessageInput readMessageInput) {
+        chatService.readMessage(readMessageInput);
+    }
+
     @GetMapping("/chat/{recipient}")
     public ResponseEntity<?> getMessages(@PathVariable String recipient,
                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
@@ -34,5 +40,10 @@ public class ChatController {
     @GetMapping("/chat/room-list")
     public ResponseEntity<?> getChatRoomList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
         return ResponseEntity.ok(chatService.getChatRoomList(authorization));
+    }
+
+    @GetMapping("/chat/unread-message-count")
+    public ResponseEntity<?> getChatUnreadMessageCount(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+        return ResponseEntity.ok(chatService.getChatUnreadMessageCount(authorization));
     }
 }

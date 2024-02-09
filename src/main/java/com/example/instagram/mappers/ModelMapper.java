@@ -87,4 +87,14 @@ public class ModelMapper {
         }
         return lastMessageDto;
     }
+
+    public static MessageDto messageToMessageDto(Message message){
+        MessageDto messageDto = new MessageDto();
+        messageDto.setSender(message.getSender());
+        messageDto.setRecipient(message.getRecipient());
+        messageDto.setMessage(message.getMessage());
+        messageDto.setTimestamp(message.getTimestamp());
+        messageDto.setStatus(message.getStatus());
+        return messageDto;
+    }
 }
