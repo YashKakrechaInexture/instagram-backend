@@ -20,8 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -126,6 +130,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "userMessagePage", key = "#username")
     public MessagePageProfileResponse getMessagePageProfile(String username) {
         MessagePageProfileProjection messagePageProfileProjection = userRepository.findByUsernameIs(username);
         MessagePageProfileResponse messagePageProfileResponse =
@@ -135,6 +140,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = "userMessagePage", allEntries = true)
     public ResponseMessage updateProfilePic(MultipartFile profilePic, String authorization) {
         User user = getUserFromAuthorizationToken(authorization);
         String imageName = null;
@@ -252,7 +258,8 @@ public class UserServiceImpl implements UserService {
         String strId = jwtTokenUtil.extractClaimValue(authorization, JwtTokenUtil.JWT_ID);
         return Long.parseLong(strId);
     }
-    private User getUserFromAuthorizationToken(String authorization){
+
+    public User getUserFromAuthorizationToken(String authorization){
         long id = getUserIdFromAuthorizationToken(authorization);
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: "+id));
     }
@@ -273,8 +280,9 @@ public class UserServiceImpl implements UserService {
 
     private ResponseMessage sendSignupMail(User user){
         try {
-            Path newAccountTemplateFile = Path.of(UserServiceImpl.class.getResource("/templates/signup-template.html").getPath());
-            String template = Files.readString(newAccountTemplateFile);
+            ClassPathResource resource = new ClassPathResource("/templates/signup-template.html");
+            byte[] templateBytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
+            String template = new String(templateBytes);
 
             template = template.replace("{{fullName}}", user.getFullName());
             template = template.replace("{{username}}", user.getUsername());

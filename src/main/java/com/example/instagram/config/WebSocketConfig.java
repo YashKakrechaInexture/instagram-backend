@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // todo : On prod deployment change allowed origin to the Frontend url only
+        // todo : On prod deployment change allowed origin to the Frontend URL only
         registry.addEndpoint("/ws")
                 .setAllowedOrigins("*");
     }

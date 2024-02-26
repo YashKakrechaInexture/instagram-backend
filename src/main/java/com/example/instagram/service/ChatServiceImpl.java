@@ -81,14 +81,16 @@ public class ChatServiceImpl implements ChatService {
     public List<MessageDto> getMessages(String recipient, String authorization) {
         User senderUser = getUserFromAuthorizationToken(authorization);
         User recipientUser = userRepository.findByUsername(recipient);
-        ChatRoom chatRoom = findChatRoomFromSenderAndRecipient(senderUser, recipientUser, true);
-        List<Message> messageList = messageRepository.findAllByChatId(chatRoom.getChatId());
         List<MessageDto> messageDtoList = new ArrayList<>();
-        for(Message message : messageList){
-            MessageDto messageDto = ModelMapper.messageToMessageDto(message);
-            messageDtoList.add(messageDto);
-            message.setStatus(MessageStatus.READ);
-            messageRepository.save(message);
+        ChatRoom chatRoom = findChatRoomFromSenderAndRecipient(senderUser, recipientUser, false);
+        if(chatRoom != null){
+            List<Message> messageList = messageRepository.findAllByChatId(chatRoom.getChatId());
+            for(Message message : messageList){
+                MessageDto messageDto = ModelMapper.messageToMessageDto(message);
+                messageDtoList.add(messageDto);
+                message.setStatus(MessageStatus.READ);
+                messageRepository.save(message);
+            }
         }
         return messageDtoList;
     }

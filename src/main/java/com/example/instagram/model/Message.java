@@ -20,7 +20,6 @@ public class Message {
 
     private String recipient;
 
-    @Column(length = 10000)
     private String message;
 
     private Date timestamp;
