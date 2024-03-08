@@ -24,6 +24,8 @@ public class JwtTokenUtil implements Serializable {
 
     public static final String JWT_ID = "id";
 
+    public static final String JWT_USERNAME = "username";
+
     @Value("${jwt.token.validity}")
     private long jwtTokenValidity;
 
@@ -55,6 +57,7 @@ public class JwtTokenUtil implements Serializable {
         Map<String, Object> claims = new HashMap<>();
         claims.put(JWT_ROLE, userDetails.isAdmin());
         claims.put(JWT_ID, userDetails.getId());
+        claims.put(JWT_USERNAME, userDetails.getActualUsername());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
