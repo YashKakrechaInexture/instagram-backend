@@ -6,16 +6,20 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "user_table")
+@Table(name = "user_table", indexes = {
+        @Index(name="idx_email", columnList = "email"),
+        @Index(name="idx_username", columnList = "username"),
+        @Index(name="idx_email_enabled", columnList = "email,enabled"),
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 50)
     private String email;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 50)
     private String username;
 
     private String fullName;
